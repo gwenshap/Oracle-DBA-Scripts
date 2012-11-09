@@ -1,7 +1,7 @@
 -- Tablespaces, ordered by percentage of space used
 
 col bytes_used format 99999999999999 
-SELECT a.TABLESPACE_NAME, a.BYTES/1024/1024 Mbytes_used,b.BYTES/1024/1024 Mbytes_free, round(((a.BYTES-b.BYTES)/a.BYTES)*100,2) percent_used from ( select TABLESPACE_NAME, sum(BYTES) BYTES from dba_data_files group by  TABLESPACE_NAME ) a left outer join  ( select TABLESPACE_NAME,sum(BYTES) BYTES ,max(BYTES) largest from dba_free_space group by TABLESPACE_NAME ) b on a.TABLESPACE_NAME=b.TABLESPACE_NAME where 1=1 and a.tablespace_name like 'DLX_DATA_TS' order by ((a.BYTES-b.BYTES)/a.BYTES) desc
+SELECT a.TABLESPACE_NAME, a.BYTES/1024/1024 Mbytes_used,b.BYTES/1024/1024 Mbytes_free, round(((a.BYTES-b.BYTES)/a.BYTES)*100,2) percent_used from ( select TABLESPACE_NAME, sum(BYTES) BYTES from dba_data_files group by  TABLESPACE_NAME ) a left outer join  ( select TABLESPACE_NAME,sum(BYTES) BYTES ,max(BYTES) largest from dba_free_space group by TABLESPACE_NAME ) b on a.TABLESPACE_NAME=b.TABLESPACE_NAME where 1=1 and a.tablespace_name like '%' order by ((a.BYTES-b.BYTES)/a.BYTES) desc
 
 -- List files in a tablespace with current size and max size
 select file_name,bytes/1024/1024 Mbytes,autoextensible,maxbytes/1024/1024 M_maxbytes from dba_data_files where tablespace_name= 'MASTER_TBS';
