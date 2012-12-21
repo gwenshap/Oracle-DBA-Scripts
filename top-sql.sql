@@ -23,13 +23,14 @@ from (
          dense_rank() over (partition by hh.sql_id order by hh.total_ev desc) topn_ev,
          dense_rank() over (order by total_sess desc) topn
   from (
-    select h.sql_id, h.wait_class, h.event, h.current_obj#, 
+    select h.sql_id, case when h.session_state='WAITING' then h.wait_class else 'CPU' end wait_class, 
+           case when h.session_state='WAITING' then h.event else 'CPU' end event, h.current_obj#, 
            count(*) over (partition by h.sql_id) total_sess, 
-           count(*) over (partition by h.sql_id, h.event) total_ev, 
+           count(*) over (partition by h.sql_id, case when h.session_state='WAITING' then h.event else 'CPU' end) total_ev, 
            case when h.current_obj#>1 then count(*) over (partition by h.sql_id, h.current_obj#) else -1 end total_obj
     from dba_hist_active_sess_history h
     where h.instance_number=1
-      and h.session_state='WAITING'
+      --and h.session_state='WAITING'
       and h.sql_id is not null
       and h.sample_time between '&1' and '&2'
   ) hh
